@@ -1,0 +1,446 @@
+---
+title: "Frequency Manipulation"
+description: "Advanced techniques for precise temporal frequency control"
+---
+
+## Introduction
+
+Frequency manipulation is the practice of precisely adjusting temporal field frequencies to achieve specific effects while maintaining field stability and observer coherence. Unlike simple resonance, manipulation involves active real-time adjustment of field parameters.
+
+<Warning>
+  Frequency manipulation requires Level 3 certification minimum. Improper manipulation can cause irreversible temporal field damage.
+</Warning>
+
+## Core Techniques
+
+### Direct Frequency Shifting
+
+The most straightforward manipulation technique: directly changing the target frequency while maintaining resonance lock.
+
+```python
+from tre_sdk import Resonator, TemporalField
+from tre_sdk.manipulation import FrequencyShifter
+
+field = TemporalField.measure()
+resonator = Resonator.connect('/dev/tres0')
+shifter = FrequencyShifter(resonator)
+
+# Establish baseline resonance
+shifter.lock_to_harmonic(1)
+
+# Gradually shift frequency
+target_shift = 0.05  # GHz
+shifter.smooth_shift(
+    delta_frequency=target_shift,
+    duration=30,  # seconds
+    curve='sigmoid'  # smooth acceleration/deceleration
+)
+```
+
+<Info>
+  The sigmoid curve provides the smoothest transition, minimizing field disruption. Linear shifts can cause coherence drops.
+</Info>
+
+### Frequency Sweeping
+
+Scanning across a range of frequencies to map field response or locate optimal resonance points.
+
+```python
+from tre_sdk.manipulation import FrequencySweeper
+
+sweeper = FrequencySweeper(resonator)
+
+# Sweep from first to second harmonic
+results = sweeper.sweep(
+    start_frequency=field.base_frequency * 1.618,
+    end_frequency=field.base_frequency * 3.236,
+    step_size=0.001,  # GHz
+    dwell_time=2  # seconds per step
+)
+
+# Analyze results
+optimal = results.find_peak_coupling()
+print(f"Optimal frequency: {optimal.frequency} GHz")
+print(f"Coupling coefficient: {optimal.coupling}")
+```
+
+### Frequency Modulation
+
+Applying time-varying frequency patterns to create specific temporal field effects.
+
+<Tabs>
+  <Tab title="Amplitude Modulation">
+    Varying the resonance power while maintaining constant frequency:
+
+    ```python
+    from tre_sdk.manipulation import AmplitudeModulator
+
+    modulator = AmplitudeModulator(resonator)
+
+    # 1 Hz sine wave modulation
+    modulator.set_waveform('sine')
+    modulator.set_carrier_frequency(field.base_frequency * 1.618)
+    modulator.set_modulation_frequency(1.0)  # Hz
+    modulator.set_modulation_depth(0.3)  # 30% variation
+
+    modulator.engage(duration=60)
+    ```
+  </Tab>
+
+  <Tab title="Frequency Modulation">
+    Varying the frequency itself in a controlled pattern:
+
+    ```python
+    from tre_sdk.manipulation import FrequencyModulator
+
+    modulator = FrequencyModulator(resonator)
+
+    # Sweep pattern repeating at 0.5 Hz
+    modulator.set_waveform('sawtooth')
+    modulator.set_center_frequency(field.base_frequency * 1.618)
+    modulator.set_modulation_frequency(0.5)  # Hz
+    modulator.set_frequency_deviation(0.01)  # GHz
+
+    modulator.engage(duration=120)
+    ```
+  </Tab>
+
+  <Tab title="Phase Modulation">
+    Modulating the phase relationship between resonator and field:
+
+    ```python
+    from tre_sdk.manipulation import PhaseModulator
+
+    modulator = PhaseModulator(resonator)
+
+    # Rotating phase at 2 Hz
+    modulator.set_waveform('triangle')
+    modulator.set_modulation_frequency(2.0)  # Hz
+    modulator.set_phase_deviation(45)  # degrees
+
+    modulator.engage(duration=90)
+    ```
+  </Tab>
+</Tabs>
+
+## Advanced Manipulation
+
+### Multi-Resonator Coordination
+
+Using multiple resonators in coordination to create complex field patterns.
+
+<Warning>
+  Multi-resonator operations require Level 4 certification and dedicated coordination software.
+</Warning>
+
+```python
+from tre_sdk.coordination import ResonatorArray
+
+array = ResonatorArray([
+    Resonator.connect('/dev/tres0'),
+    Resonator.connect('/dev/tres1'),
+    Resonator.connect('/dev/tres2')
+])
+
+# Configure phased array
+array.set_geometry('triangular', spacing=2.0)  # 2 meters
+array.set_frequency(field.base_frequency * 1.618)
+
+# Create focused temporal beam
+beam = array.create_beam(
+    direction=(0, 0, 1),  # upward
+    focus_distance=5.0,  # 5 meters
+    beam_width=0.5  # meters
+)
+
+beam.engage(power=0.4)
+```
+
+### Adaptive Frequency Control
+
+Real-time adjustment based on field feedback to maintain optimal resonance despite environmental changes.
+
+```python
+from tre_sdk.manipulation import AdaptiveController
+
+controller = AdaptiveController(resonator, field)
+
+# Configure control loop
+controller.set_target_coherence(0.95)
+controller.set_control_algorithm('pid')
+controller.set_pid_parameters(
+    kp=0.8,  # proportional gain
+    ki=0.2,  # integral gain
+    kd=0.1   # derivative gain
+)
+
+# Run adaptive control
+controller.start()
+
+try:
+    # Perform your experiment
+    time.sleep(300)
+finally:
+    controller.stop()
+
+# Analyze control performance
+performance = controller.get_performance_metrics()
+print(f"Mean coherence: {performance.mean_coherence}")
+print(f"Coherence std dev: {performance.coherence_stddev}")
+```
+
+### Harmonic Injection
+
+Injecting specific harmonic content to shape the temporal field spectrum.
+
+```python
+from tre_sdk.manipulation import HarmonicInjector
+
+injector = HarmonicInjector(resonator)
+
+# Inject second and third harmonics simultaneously
+injector.add_harmonic(
+    harmonic_number=2,
+    amplitude=0.3,
+    phase=0
+)
+injector.add_harmonic(
+    harmonic_number=3,
+    amplitude=0.15,
+    phase=90
+)
+
+injector.engage()
+
+# Monitor spectral content
+spectrum = field.measure_spectrum()
+spectrum.plot(output='harmonic_spectrum.png')
+```
+
+## Manipulation Constraints
+
+### Coherence Limits
+
+Field coherence must remain above critical thresholds:
+
+| Coherence Level | Status | Action Required |
+|----------------|--------|-----------------|
+| ≥ 0.95 | Excellent | Continue operation |
+| 0.85 - 0.95 | Good | Monitor closely |
+| 0.75 - 0.85 | Marginal | Reduce manipulation intensity |
+| < 0.75 | Critical | Emergency shutdown required |
+
+```python
+# Automatic coherence enforcement
+def safe_manipulation(manipulation_func):
+    def wrapper(*args, **kwargs):
+        result = manipulation_func(*args, **kwargs)
+
+        coherence = field.measure_coherence()
+        if coherence < 0.85:
+            resonator.emergency_stop()
+            raise CoherenceLimitError(f"Coherence dropped to {coherence}")
+
+        return result
+    return wrapper
+
+@safe_manipulation
+def my_experiment():
+    # Your manipulation code here
+    pass
+```
+
+### Rate Limits
+
+Frequency changes have maximum safe rates:
+
+- **Slow manipulation**: < 0.01 GHz/s (safest)
+- **Moderate manipulation**: 0.01 - 0.05 GHz/s (requires monitoring)
+- **Rapid manipulation**: > 0.05 GHz/s (Level 4+ only, high risk)
+
+```python
+# Enforce rate limiting
+from tre_sdk.safety import RateLimiter
+
+limiter = RateLimiter(max_rate=0.05)  # GHz/s
+
+def limited_frequency_change(new_frequency):
+    current = resonator.get_frequency()
+    delta = abs(new_frequency - current)
+
+    if not limiter.check_rate(delta, time_delta=1.0):
+        raise RateLimitError("Frequency change too rapid")
+
+    resonator.set_frequency(new_frequency)
+```
+
+## Manipulation Patterns
+
+### Temporal Stretching
+
+Creating regions of locally dilated time:
+
+```python
+from tre_sdk.patterns import TemporalStretcher
+
+stretcher = TemporalStretcher(resonator, field)
+
+# Create 1.1x temporal dilation in 1m radius
+stretcher.create_dilation(
+    center=(0, 0, 1),  # meters
+    radius=1.0,  # meters
+    dilation_factor=1.1,
+    duration=60  # seconds
+)
+```
+
+### Temporal Compression
+
+Creating regions of locally accelerated time:
+
+```python
+from tre_sdk.patterns import TemporalCompressor
+
+compressor = TemporalCompressor(resonator, field)
+
+# Create 0.9x temporal compression
+compressor.create_compression(
+    center=(0, 0, 1),
+    radius=1.0,
+    compression_factor=0.9,
+    duration=60
+)
+```
+
+### Temporal Isolation
+
+Creating temporally isolated regions (chronostasis):
+
+<Warning>
+  Temporal isolation is experimental and requires Level 5 authorization from TRE Council.
+</Warning>
+
+```python
+from tre_sdk.patterns import ChronostasisField
+
+chronostasis = ChronostasisField(array)  # Requires resonator array
+
+# Create isolated temporal bubble
+chronostasis.create_bubble(
+    center=(0, 0, 1),
+    radius=0.5,
+    isolation_depth=0.001,  # millisecond-scale isolation
+    duration=10  # seconds
+)
+```
+
+## Safety Protocols
+
+<AccordionGroup>
+  <Accordion title="Pre-Manipulation Checklist" icon="list-check">
+    - [ ] Verify current certification level
+    - [ ] Check all safety equipment operational
+    - [ ] Confirm shielding integrity
+    - [ ] Establish baseline field measurements
+    - [ ] Configure automatic safety cutoffs
+    - [ ] Test emergency stop system
+  </Accordion>
+
+  <Accordion title="During Manipulation" icon="eye">
+    - Monitor coherence continuously
+    - Watch for beat frequencies
+    - Track power consumption
+    - Observe observer synchronization
+    - Log all parameter changes
+  </Accordion>
+
+  <Accordion title="Post-Manipulation" icon="clipboard-check">
+    - Gradual resonator shutdown
+    - Verify field returns to baseline
+    - Document all anomalies
+    - Calibrate equipment
+    - File safety report if required
+  </Accordion>
+</AccordionGroup>
+
+## Troubleshooting
+
+<Tabs>
+  <Tab title="Coherence Loss">
+    **Symptoms**: Coherence drops during manipulation
+
+    **Causes**:
+    - Manipulation rate too high
+    - Unintended harmonic coupling
+    - Environmental interference
+
+    **Solutions**:
+    ```python
+    # Reduce manipulation intensity
+    controller.set_max_rate(controller.max_rate * 0.5)
+
+    # Increase averaging time
+    field.set_measurement_averaging(10)
+
+    # Enable adaptive control
+    controller.enable_adaptive_mode()
+    ```
+  </Tab>
+
+  <Tab title="Frequency Lock Loss">
+    **Symptoms**: Resonator loses frequency lock
+
+    **Causes**:
+    - Target frequency outside resonator range
+    - Insufficient resonator power
+    - Phase instability
+
+    **Solutions**:
+    ```python
+    # Check frequency range
+    if not resonator.is_frequency_valid(target):
+        print("⚠️ Target frequency out of range")
+
+    # Increase lock bandwidth
+    resonator.set_lock_bandwidth(0.01)  # GHz
+
+    # Enable phase-locked loop
+    resonator.enable_pll()
+    ```
+  </Tab>
+
+  <Tab title="Unexpected Field Response">
+    **Symptoms**: Field behaves unexpectedly
+
+    **Causes**:
+    - Hidden harmonic resonances
+    - Multi-path interference
+    - Equipment calibration drift
+
+    **Solutions**:
+    ```python
+    # Full spectral analysis
+    spectrum = field.measure_full_spectrum(
+        fmin=0,
+        fmax=20,  # GHz
+        resolution=0.001
+    )
+    spectrum.identify_resonances()
+
+    # Recalibrate equipment
+    resonator.full_calibration()
+    field.recalibrate_detector()
+    ```
+  </Tab>
+</Tabs>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Quantum Bridging" icon="bridge" href="/essentials/quantum-bridging">
+    Advanced cross-temporal techniques
+  </Card>
+  <Card title="Resonator Systems" icon="microchip" href="/essentials/resonators">
+    Equipment specifications and setup
+  </Card>
+</CardGroup>

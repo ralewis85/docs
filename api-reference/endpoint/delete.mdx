@@ -1,4 +1,10 @@
 ---
-title: 'Delete Plant'
-openapi: 'DELETE /plants/{id}'
+title: 'Stop Resonator'
+openapi: 'POST /resonators/{id}/stop'
 ---
+
+Gracefully stop a running resonator. For emergency situations, use the emergency stop endpoint instead.
+
+<Note>
+  Gradual power reduction takes approximately 60 seconds to complete safely.
+</Note>

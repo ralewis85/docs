@@ -1,4 +1,10 @@
 ---
-title: 'Get Plants'
-openapi: 'GET /plants'
+title: 'Get Measurements'
+openapi: 'GET /detectors/{id}/measurements'
 ---
+
+Retrieve temporal field measurements from a detector.
+
+<Info>
+  Measurements are returned in chronological order. Use pagination for large datasets.
+</Info>

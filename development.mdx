@@ -1,94 +1,418 @@
 ---
-title: 'Development'
-description: 'Preview changes locally to update your docs'
+title: 'Safety Protocols & Lab Setup'
+description: 'Essential safety procedures and laboratory configuration for TRE operations'
 ---
+
+<Warning>
+  **Mandatory Safety Training Required**
+
+  All personnel must complete TRE Council Safety Certification before operating temporal resonance equipment. Violations will result in immediate certification suspension and potential legal consequences.
+</Warning>
+
+## Laboratory Requirements
+
+Before conducting any TRE operations, your laboratory must meet minimum safety standards:
 
 <Info>
   **Prerequisites**:
-  - Node.js version 19 or higher
-  - A docs repository with a `docs.json` file
+  - TRE Council Level 2 facility certification
+  - Faraday-Heisenberg shielding (minimum Level 2)
+  - Emergency temporal anchor beacon system
+  - Isolated power supply with UPS backup (>30 minutes)
+  - Environmental monitoring systems
+  - Emergency response protocol documentation
 </Info>
 
-Follow these steps to install and run Mintlify on your operating system.
+## Essential Safety Equipment
 
 <Steps>
-<Step title="Install the Mintlify CLI">
+<Step title="Faraday-Heisenberg Shielding">
+
+All TRE operations must be conducted within proper shielding to prevent external interference and contain temporal field effects.
 
 ```bash
-npm i -g mint
+# Verify shielding integrity
+tre-cli shield verify --full-spectrum --device /dev/shield0
+
+# Expected output:
+# All zones: NOMINAL
+# Attenuation: >120 dB @ 0-50 GHz
+# Temporal isolation factor: 45.3
+# Status: OPERATIONAL ✓
 ```
+
+<Note>
+  Schedule monthly shielding inspections. Annual recertification required by TRE Council.
+</Note>
+
 </Step>
 
-<Step title="Preview locally">
+<Step title="Emergency Stop System">
 
-Navigate to your docs directory where your `docs.json` file is located, and run the following command:
+Install and test emergency stop systems before each session:
 
 ```bash
-mint dev
+# Test emergency stop circuit
+tre-cli safety test-emergency-stop
+
+# Configure emergency triggers
+tre-cli safety configure-triggers \
+  --coherence-min 0.75 \
+  --power-max-deviation 0.3 \
+  --temporal-gradient-max 0.1
 ```
 
-A local preview of your documentation will be available at `http://localhost:3000`.
+All operators must have immediate access to manual emergency stop buttons located at each workstation and room exit.
+
+</Step>
+
+<Step title="Temporal Field Monitoring">
+
+Continuous monitoring of temporal field parameters is mandatory:
+
+```bash
+# Initialize monitoring system
+tre-cli monitor start \
+  --sample-rate 100 \
+  --alert-coherence 0.85 \
+  --alert-gradient 0.05 \
+  --log-directory /var/log/tre
+
+# Monitoring dashboard accessible at:
+# https://monitor.tre-lab.local:8443
+```
 
 </Step>
 </Steps>
 
-## Custom ports
+## Personal Protective Equipment (PPE)
 
-By default, Mintlify uses port 3000. You can customize the port Mintlify runs on by using the `--port` flag. For example, to run Mintlify on port 3333, use this command:
+<Tabs>
+  <Tab title="Required PPE">
+    **Mandatory for all personnel in active TRE areas**:
 
-```bash
-mint dev --port 3333
-```
+    - Temporal field exposure badge (dosimeter)
+    - Safety glasses (temporal-grade UV protection)
+    - Grounding strap (prevents observer desynchronization)
+    - Emergency temporal anchor (wearable device)
 
-If you attempt to run Mintlify on a port that's already in use, it will use the next available port:
+    ```bash
+    # Verify PPE calibration
+    tre-cli ppe verify-all
+    ```
+  </Tab>
 
-```md
-Port 3000 is already in use. Trying 3001 instead.
-```
+  <Tab title="Exposure Limits">
+    **Maximum Temporal Field Exposure**:
 
-## Mintlify versions
+    | Duration | Max TIF Exposure | Field Strength |
+    |----------|------------------|----------------|
+    | 15 minutes | 10 | <0.5 nT |
+    | 1 hour | 5 | <0.2 nT |
+    | 8 hours (daily) | 2 | <0.1 nT |
 
-Please note that each CLI release is associated with a specific version of Mintlify. If your local preview does not align with the production version, please update the CLI:
+    Exceeding these limits requires Level 4 authorization and medical supervision.
+  </Tab>
 
-```bash
-npm mint update
-```
+  <Tab title="Dosimeter Reading">
+    ```bash
+    # Read temporal exposure dosimeter
+    tre-cli ppe read-dosimeter --badge-id TED-12345
 
-## Validating links
+    # Output:
+    # Total exposure today: 3.2 TIF-hours
+    # Peak exposure: 8.7 TIF @ 14:32:15
+    # Status: WITHIN LIMITS ✓
+    # Days until reset: 1
+    ```
 
-The CLI can assist with validating links in your documentation. To identify any broken links, use the following command:
+    <Warning>
+      If dosimeter shows "OVEREXPOSURE", immediately evacuate shielded area and report to medical personnel.
+    </Warning>
+  </Tab>
+</Tabs>
 
-```bash
-mint broken-links
-```
+## Pre-Operation Checklist
 
-## Deployment
-
-If the deployment is successful, you should see the following:
-
-<Frame>
-  <img src="/images/checks-passed.png" alt="Screenshot of a deployment confirmation message that says All checks have passed." style={{ borderRadius: '0.5rem' }} />
-</Frame>
-
-## Code formatting
-
-We suggest using extensions on your IDE to recognize and format MDX. If you're a VSCode user, consider the [MDX VSCode extension](https://marketplace.visualstudio.com/items?itemName=unifiedjs.vscode-mdx) for syntax highlighting, and [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) for code formatting.
-
-## Troubleshooting
+Before beginning any TRE experiment:
 
 <AccordionGroup>
-  <Accordion title='Error: Could not load the "sharp" module using the darwin-arm64 runtime'>
-
-    This may be due to an outdated version of node. Try the following:
-    1. Remove the currently-installed version of the CLI: `npm remove -g mint`
-    2. Upgrade to Node v19 or higher.
-    3. Reinstall the CLI: `npm i -g mint`
+  <Accordion title="Equipment Verification" icon="check">
+    - [ ] All resonators calibrated within past 30 days
+    - [ ] Detectors showing stable baseline readings
+    - [ ] Shielding integrity verified
+    - [ ] Emergency stop system tested
+    - [ ] Backup power system charged
+    - [ ] Cooling systems operational
+    - [ ] Data logging enabled
   </Accordion>
 
-  <Accordion title="Issue: Encountering an unknown error">
-  
-    Solution: Go to the root of your device and delete the `~/.mintlify` folder. Then run `mint dev` again.
+  <Accordion title="Personnel Safety" icon="user-shield">
+    - [ ] All personnel wearing required PPE
+    - [ ] Dosimeters calibrated and zeroed
+    - [ ] Observer clearance zones established (minimum 5m)
+    - [ ] Emergency procedures reviewed
+    - [ ] Medical personnel on-call
+    - [ ] Communication systems tested
+  </Accordion>
+
+  <Accordion title="Environmental Conditions" icon="cloud">
+    - [ ] Temperature: 23±2°C
+    - [ ] Humidity: 40-60%
+    - [ ] Ambient field noise: <0.05 nT
+    - [ ] Electromagnetic interference: <-80 dBm
+    - [ ] Vibration: <10 μm
+    - [ ] No external temporal perturbations detected
+  </Accordion>
+
+  <Accordion title="Documentation" icon="file-lines">
+    - [ ] Experiment protocol approved
+    - [ ] Risk assessment completed
+    - [ ] Data storage configured
+    - [ ] Session ID generated
+    - [ ] Logging systems active
+    - [ ] Backup systems verified
   </Accordion>
 </AccordionGroup>
 
-Curious about what changed in the latest CLI version? Check out the [CLI changelog](https://www.npmjs.com/package/mintlify?activeTab=versions).
+## Standard Operating Procedures
+
+### Starting a TRE Session
+
+```bash
+# 1. Initialize lab environment
+tre-cli session init \
+  --protocol "Harmonic Resonance Study" \
+  --operator "Dr. Smith" \
+  --certification "TRE-L3-2024-0451"
+
+# 2. Verify all safety systems
+tre-cli safety verify-all
+
+# 3. Establish baseline measurements
+tre-cli baseline measure --duration 300
+
+# 4. Log session start
+tre-cli session start --auto-backup
+```
+
+### During Operations
+
+```bash
+# Continuous monitoring (run in separate terminal)
+tre-cli monitor watch \
+  --update-rate 1 \
+  --alert-audio \
+  --alert-visual
+
+# Check system health periodically
+tre-cli health check --comprehensive
+
+# If issues arise
+tre-cli diagnostics run --full
+```
+
+### Ending a TRE Session
+
+```bash
+# 1. Gradual resonator shutdown
+tre-cli resonator shutdown-all --gradual --duration 60
+
+# 2. Wait for field stabilization
+tre-cli monitor wait-stable --timeout 600
+
+# 3. Verify safe state
+tre-cli safety verify-safe-state
+
+# 4. Export data and logs
+tre-cli session export \
+  --output /data/sessions/$(date +%Y%m%d) \
+  --include-logs \
+  --include-raw-data
+
+# 5. Close session
+tre-cli session close --generate-report
+```
+
+## Emergency Procedures
+
+<Warning>
+  **In Case of Emergency**
+
+  1. Activate emergency stop (red button)
+  2. Evacuate shielded area immediately
+  3. Monitor coherence from safe distance
+  4. Contact TRE Council emergency line: +1-555-TRE-HELP
+  5. Do not re-enter until cleared by safety officer
+</Warning>
+
+### Emergency Scenarios
+
+<Tabs>
+  <Tab title="Coherence Loss">
+    **If field coherence drops below 0.75**:
+
+    ```bash
+    # Automatic emergency stop should trigger
+    # If manual intervention needed:
+    tre-cli emergency-stop --reason "coherence_loss"
+
+    # Monitor from safe location
+    tre-cli monitor remote --safe-mode
+
+    # Wait for field stabilization (typically 5-10 minutes)
+    # Do not re-enter until coherence >0.90
+    ```
+  </Tab>
+
+  <Tab title="Power Failure">
+    **In case of power loss**:
+
+    - UPS will maintain critical systems for 30+ minutes
+    - Resonators automatically enter safe shutdown mode
+    - Emergency lighting activates
+    - Maintain calm evacuation
+    - Battery-powered monitors track field decay
+
+    ```bash
+    # Check backup power status
+    tre-cli power status
+
+    # Estimated runtime remaining: 38 minutes
+    # All systems: BATTERY BACKUP ✓
+    ```
+  </Tab>
+
+  <Tab title="Observer Desynchronization">
+    **If temporal dosimeter shows desynchronization warning**:
+
+    1. Immediately cease all activity
+    2. Evacuate shielded area
+    3. Seek medical attention
+    4. Monitor for symptoms:
+       - Temporal disorientation
+       - Memory discontinuity
+       - Nausea or dizziness
+       - Unusual perception of time flow
+
+    ```bash
+    # Record incident
+    tre-cli incident report \
+      --type observer_desync \
+      --severity high \
+      --personnel "badge:TED-12345"
+    ```
+  </Tab>
+
+  <Tab title="Causality Violation">
+    **CRITICAL: If causality monitoring system alerts**:
+
+    <Warning>
+      This is the most serious emergency. Follow protocol exactly.
+    </Warning>
+
+    1. **DO NOT** attempt manual shutdown
+    2. Activate automated causality-safe shutdown
+    3. Evacuate facility immediately
+    4. Contact TRE Council emergency response
+    5. Establish 100m exclusion zone
+    6. Do not re-enter for minimum 24 hours
+
+    ```bash
+    # Automated response (system will execute)
+    tre-cli causality-emergency \
+      --activate-containment \
+      --notify-council \
+      --facility-lockdown
+    ```
+  </Tab>
+</Tabs>
+
+## Maintenance Schedule
+
+<AccordionGroup>
+  <Accordion title="Daily" icon="calendar-day">
+    - Pre-operation safety checks
+    - Equipment functionality tests
+    - Environmental monitoring
+    - Dosimeter readings
+    - Log review
+  </Accordion>
+
+  <Accordion title="Weekly" icon="calendar-week">
+    - Calibration verification
+    - Shielding integrity check
+    - Backup system test
+    - Emergency procedure drill
+    - Data backup verification
+  </Accordion>
+
+  <Accordion title="Monthly" icon="calendar">
+    - Full equipment calibration
+    - Shielding inspection by certified technician
+    - Safety system comprehensive test
+    - PPE replacement/recalibration
+    - Documentation review
+  </Accordion>
+
+  <Accordion title="Annually" icon="calendar-days">
+    - TRE Council facility recertification
+    - Complete equipment overhaul
+    - Shielding recertification
+    - Personnel retraining
+    - Emergency response audit
+  </Accordion>
+</AccordionGroup>
+
+## Incident Reporting
+
+All incidents must be reported to TRE Council within 24 hours:
+
+```bash
+# Create incident report
+tre-cli incident create \
+  --type [coherence_loss|equipment_failure|exposure|other] \
+  --severity [low|medium|high|critical] \
+  --description "Brief description" \
+  --affected-systems "tres0,tfd0" \
+  --personnel-involved "badge:TED-12345"
+
+# Report will be automatically submitted to TRE Council
+# Incident ID: INC-2024-03-15-0042
+```
+
+## Regulatory Compliance
+
+<Note>
+  All TRE operations are subject to:
+  - TRE Council Safety Regulations (TRESR-2024)
+  - International Temporal Research Guidelines
+  - Local radiation and quantum safety laws
+  - Occupational safety requirements
+
+  Maintain current documentation for inspections.
+</Note>
+
+## Support Resources
+
+<CardGroup cols={2}>
+  <Card title="Emergency Hotline" icon="phone">
+    +1-555-TRE-HELP (24/7)
+  </Card>
+  <Card title="Safety Officer" icon="user-shield">
+    safety@tre-institute.research
+  </Card>
+  <Card title="TRE Council" icon="building">
+    council@tre-institute.research
+  </Card>
+  <Card title="Medical Support" icon="heart-pulse">
+    +1-555-TRE-MED (24/7)
+  </Card>
+</CardGroup>
+
+## Additional Resources
+
+- [TRE Safety Manual (PDF)](#)
+- [Incident Response Procedures](#)
+- [Equipment Operating Guidelines](#)
+- [Certification Requirements](#)

@@ -1,0 +1,538 @@
+---
+title: "Event Reconstruction"
+description: "Reconstructing past temporal field states from residual signatures"
+---
+
+## Overview
+
+Event reconstruction is an advanced TRE technique that analyzes residual temporal field signatures to reconstruct past field states. This allows practitioners to examine temporal events that have already occurred, similar to reading an echo in spacetime.
+
+<Warning>
+  Event reconstruction requires Level 4 certification. The technique involves interpreting subtle field imprints that can be easily misread without proper training.
+</Warning>
+
+## Theoretical Basis
+
+### Temporal Field Memory
+
+Temporal fields retain "memory" of past states through residual quantum correlations. When a temporal field is disturbed, it doesn't instantly return to equilibrium—it carries an imprint of recent perturbations.
+
+The **field memory function** M(τ) describes how much information about the past persists:
+
+```
+M(τ) = M₀ × e^(-τ/τ_c)
+```
+
+Where:
+- `τ` = time elapsed since event
+- `τ_c` = characteristic memory time (typically 100-300 seconds)
+- `M₀` = initial memory strength
+
+```python
+from tre_sdk.reconstruction import FieldMemory
+
+memory = FieldMemory(detector)
+
+# Measure current memory content
+memory_state = memory.measure()
+
+print(f"Memory strength: {memory_state.strength}")
+print(f"Characteristic time: {memory_state.tau_c} seconds")
+print(f"Reconstruction horizon: {memory_state.horizon} seconds")
+```
+
+### Reconstruction Limits
+
+<Info>
+  The **reconstruction horizon** is the maximum time into the past that can be reliably reconstructed. It depends on field coherence and environmental noise.
+</Info>
+
+Typical reconstruction horizons:
+- **Laboratory (clean)**: 300-600 seconds
+- **Laboratory (noisy)**: 60-120 seconds
+- **Field environment**: 20-60 seconds
+- **Unshielded**: <10 seconds
+
+## Basic Reconstruction
+
+### Single-Point Reconstruction
+
+Reconstruct the field state at a single spatial location:
+
+```python
+from tre_sdk.reconstruction import EventReconstructor
+
+reconstructor = EventReconstructor(detector)
+
+# Measure current field state
+current_state = detector.measure_current()
+
+# Reconstruct state 60 seconds ago
+past_state = reconstructor.reconstruct_point(
+    time_offset=-60,  # seconds (negative = past)
+    confidence_threshold=0.8
+)
+
+print(f"Reconstructed BTF: {past_state.base_frequency} GHz")
+print(f"Confidence: {past_state.confidence:.2%}")
+print(f"Uncertainty: ±{past_state.uncertainty} GHz")
+
+# Compare to current
+delta = current_state.base_frequency - past_state.base_frequency
+print(f"Change over 60s: {delta} GHz")
+```
+
+### Time-Series Reconstruction
+
+Reconstruct a continuous time series:
+
+```python
+# Reconstruct the past 5 minutes
+reconstructed_series = reconstructor.reconstruct_timeseries(
+    start_time=-300,  # 5 minutes ago
+    end_time=0,       # present
+    resolution=1.0    # 1 second steps
+)
+
+# Plot reconstruction
+reconstructed_series.plot(
+    output='reconstruction.png',
+    show_confidence=True,
+    show_actual=True  # if available for validation
+)
+
+# Calculate reconstruction accuracy (if ground truth available)
+if reconstructed_series.has_ground_truth():
+    accuracy = reconstructed_series.calculate_accuracy()
+    print(f"Reconstruction accuracy: {accuracy:.1%}")
+```
+
+## Advanced Reconstruction
+
+### Multi-Sensor Fusion
+
+Using multiple detectors for improved reconstruction:
+
+```python
+from tre_sdk.reconstruction import MultiSensorReconstructor
+
+reconstructor = MultiSensorReconstructor([
+    detector1, detector2, detector3
+])
+
+# Calibrate sensor array
+reconstructor.calibrate_array(duration=60)
+
+# Fused reconstruction
+reconstructed = reconstructor.reconstruct(
+    time_offset=-120,
+    fusion_method='kalman_filter'
+)
+
+print(f"Fusion confidence: {reconstructed.fusion_confidence:.2%}")
+print(f"Improved uncertainty: ±{reconstructed.uncertainty} GHz")
+```
+
+### Spatial Reconstruction
+
+Reconstruct the entire 3D field structure at a past time:
+
+```python
+from tre_sdk.reconstruction import SpatialReconstructor
+
+reconstructor = SpatialReconstructor(detector_array)
+
+# Reconstruct 3D field from 2 minutes ago
+field_3d = reconstructor.reconstruct_volume(
+    time_offset=-120,
+    volume=(3, 3, 3),  # 3m x 3m x 3m
+    resolution=0.1     # 10cm voxels
+)
+
+# Visualize
+field_3d.visualize(
+    output='reconstructed_field_3d.png',
+    show_isosurfaces=True,
+    colormap='viridis'
+)
+
+# Identify features
+features = field_3d.extract_features()
+for feature in features:
+    print(f"Feature: {feature.type}")
+    print(f"  Location: {feature.position}")
+    print(f"  Strength: {feature.strength}")
+```
+
+### Event Detection
+
+Automatically detect significant past events:
+
+```python
+from tre_sdk.reconstruction import EventDetector
+
+detector_event = EventDetector(reconstructor)
+
+# Scan the past hour for events
+events = detector_event.scan_period(
+    start_time=-3600,
+    end_time=0,
+    sensitivity='high'
+)
+
+print(f"Detected {len(events)} events")
+
+for event in events:
+    print(f"\nEvent at T={event.time}s:")
+    print(f"  Type: {event.classification}")
+    print(f"  Magnitude: {event.magnitude}")
+    print(f"  Duration: {event.duration}s")
+    print(f"  Confidence: {event.confidence:.2%}")
+
+    # Reconstruct detailed event
+    event_detail = reconstructor.reconstruct_event(event)
+    event_detail.visualize(output=f'event_{event.id}.png')
+```
+
+## Reconstruction Techniques
+
+### Deconvolution Method
+
+Remove measurement blurring to improve reconstruction:
+
+<Tabs>
+  <Tab title="Basic Deconvolution">
+    ```python
+    from tre_sdk.reconstruction import Deconvolver
+
+    deconvolver = Deconvolver()
+
+    # Measure point spread function
+    psf = deconvolver.measure_psf(detector)
+
+    # Apply deconvolution
+    reconstructed = deconvolver.deconvolve(
+        measured_data=detector.get_timeseries(),
+        psf=psf,
+        method='richardson-lucy',
+        iterations=50
+    )
+
+    # Compare
+    print(f"Sharpness improvement: {reconstructed.sharpness_gain:.1f}x")
+    ```
+  </Tab>
+
+  <Tab title="Blind Deconvolution">
+    When PSF is unknown:
+
+    ```python
+    # Blind deconvolution
+    reconstructed, estimated_psf = deconvolver.blind_deconvolve(
+        measured_data=detector.get_timeseries(),
+        psf_constraints='causality',
+        max_iterations=100
+    )
+
+    # Validate estimated PSF
+    psf_quality = deconvolver.validate_psf(estimated_psf)
+    print(f"PSF estimation quality: {psf_quality:.2%}")
+    ```
+  </Tab>
+</Tabs>
+
+### Maximum Entropy Method
+
+Reconstruction using maximum entropy principle:
+
+```python
+from tre_sdk.reconstruction import MaximumEntropyReconstructor
+
+me_reconstructor = MaximumEntropyReconstructor(detector)
+
+# Reconstruct with maximum entropy constraint
+reconstructed = me_reconstructor.reconstruct(
+    time_offset=-180,
+    entropy_weight=0.1,
+    prior='flat'  # flat, gaussian, or learned
+)
+
+# Maximum entropy tends to favor smoother reconstructions
+print(f"Entropy: {reconstructed.entropy}")
+print(f"Data fidelity: {reconstructed.fidelity}")
+```
+
+### Bayesian Reconstruction
+
+Incorporate prior knowledge:
+
+```python
+from tre_sdk.reconstruction import BayesianReconstructor
+
+bayes_reconstructor = BayesianReconstructor(detector)
+
+# Define prior distribution based on typical field behavior
+prior = bayes_reconstructor.create_prior(
+    mean=field.base_frequency,
+    std=0.05,
+    distribution='gaussian'
+)
+
+# Bayesian reconstruction
+posterior = bayes_reconstructor.reconstruct(
+    time_offset=-240,
+    prior=prior,
+    likelihood_model='gaussian_noise'
+)
+
+# Get full posterior distribution, not just point estimate
+print(f"Posterior mean: {posterior.mean}")
+print(f"Posterior std: {posterior.std}")
+print(f"95% credible interval: [{posterior.ci_low}, {posterior.ci_high}]")
+
+# Sample from posterior
+samples = posterior.sample(n=1000)
+```
+
+## Applications
+
+### Incident Investigation
+
+Investigating unexpected events:
+
+```python
+from tre_sdk.reconstruction import IncidentInvestigator
+
+investigator = IncidentInvestigator(reconstructor)
+
+# Load incident timestamp
+incident_time = -420  # 7 minutes ago
+
+# Comprehensive investigation
+investigation = investigator.investigate(
+    incident_time=incident_time,
+    context_window=120,  # look ±2 minutes around incident
+    detail_level='high'
+)
+
+# Generate report
+report = investigation.generate_report()
+
+print("Incident Summary:")
+print(f"  Time: {investigation.incident_time}")
+print(f"  Probable cause: {investigation.probable_cause}")
+print(f"  Contributing factors: {investigation.factors}")
+print(f"  Severity: {investigation.severity}")
+
+# Timeline visualization
+investigation.plot_timeline(output='incident_timeline.png')
+
+# Save full report
+report.save('incident_report.pdf')
+```
+
+### Experiment Validation
+
+Verify that experiments proceeded as planned:
+
+```python
+from tre_sdk.reconstruction import ExperimentValidator
+
+validator = ExperimentValidator(reconstructor)
+
+# Define expected experiment protocol
+expected_protocol = {
+    'duration': 600,
+    'frequency': 2.847 * 1.618,
+    'power': 0.3,
+    'coherence_min': 0.85
+}
+
+# Validate against reconstruction
+validation = validator.validate_experiment(
+    start_time=-600,
+    end_time=0,
+    expected=expected_protocol
+)
+
+print(f"Protocol adherence: {validation.adherence:.1%}")
+
+if not validation.passed:
+    print("Deviations detected:")
+    for deviation in validation.deviations:
+        print(f"  {deviation.time}: {deviation.description}")
+```
+
+### Temporal Forensics
+
+Investigating unauthorized or suspicious temporal field activity:
+
+<Warning>
+  Temporal forensics should only be conducted by authorized personnel with proper legal authorization.
+</Warning>
+
+```python
+from tre_sdk.reconstruction import TemporalForensics
+
+forensics = TemporalForensics(reconstructor)
+
+# Scan for anomalous activity
+scan_results = forensics.scan_period(
+    start_time=-86400,  # past 24 hours
+    end_time=0,
+    anomaly_threshold=0.7
+)
+
+# Classify anomalies
+for anomaly in scan_results.anomalies:
+    classification = forensics.classify_anomaly(anomaly)
+
+    print(f"Anomaly at T={anomaly.time}:")
+    print(f"  Classification: {classification.type}")
+    print(f"  Likelihood of human origin: {classification.human_prob:.1%}")
+    print(f"  Matches known signatures: {classification.matches}")
+
+    # Detailed reconstruction
+    if classification.human_prob > 0.8:
+        details = forensics.reconstruct_detailed(anomaly)
+        details.save(f'forensics_anomaly_{anomaly.id}.dat')
+```
+
+## Reconstruction Quality
+
+### Confidence Assessment
+
+Assessing reconstruction reliability:
+
+```python
+from tre_sdk.reconstruction import ConfidenceAssessor
+
+assessor = ConfidenceAssessor()
+
+# Evaluate reconstruction quality
+quality = assessor.assess(reconstructed_data)
+
+print("Quality Metrics:")
+print(f"  Signal-to-noise ratio: {quality.snr} dB")
+print(f"  Temporal resolution: {quality.temporal_resolution} seconds")
+print(f"  Spatial resolution: {quality.spatial_resolution} meters")
+print(f"  Overall confidence: {quality.confidence:.2%}")
+
+# Identify unreliable regions
+unreliable = quality.find_unreliable_regions(threshold=0.7)
+for region in unreliable:
+    print(f"  Low confidence: {region.time_range}")
+```
+
+### Uncertainty Quantification
+
+Rigorous uncertainty estimation:
+
+```python
+from tre_sdk.reconstruction import UncertaintyQuantifier
+
+quantifier = UncertaintyQuantifier()
+
+# Bootstrap uncertainty estimation
+uncertainty = quantifier.bootstrap_uncertainty(
+    reconstructor=reconstructor,
+    time_offset=-180,
+    n_bootstrap=1000
+)
+
+print(f"Standard error: {uncertainty.standard_error}")
+print(f"95% confidence interval: [{uncertainty.ci_low}, {uncertainty.ci_high}]")
+
+# Visualize uncertainty distribution
+uncertainty.plot_distribution(output='uncertainty_dist.png')
+```
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Data Quality" icon="check">
+    - Ensure continuous detector operation
+    - Minimize environmental interference
+    - Regular calibration (weekly minimum)
+    - Maintain high SNR (>40 dB for reconstruction)
+    - Use multiple detectors when possible
+  </Accordion>
+
+  <Accordion title="Reconstruction Parameters" icon="sliders">
+    - Start with conservative time offsets (< 100s)
+    - Increase resolution gradually
+    - Always check confidence scores
+    - Validate with known events when possible
+    - Document all assumptions
+  </Accordion>
+
+  <Accordion title="Interpretation" icon="book">
+    - Never rely on single reconstruction
+    - Consider multiple reconstruction methods
+    - Account for systematic biases
+    - Acknowledge uncertainty in conclusions
+    - Seek peer review for critical applications
+  </Accordion>
+
+  <Accordion title="Documentation" icon="file-lines">
+    - Record all reconstruction parameters
+    - Save raw data for re-analysis
+    - Document confidence assessments
+    - Maintain audit trail
+    - Follow TRE Council reporting requirements
+  </Accordion>
+</AccordionGroup>
+
+## Limitations and Cautions
+
+<Warning>
+  **Critical Limitations**
+
+  1. **Reconstruction horizon**: Cannot reliably reconstruct beyond field memory time
+  2. **Resolution trade-off**: Better temporal resolution reduces spatial resolution
+  3. **Noise amplification**: Reconstruction amplifies measurement noise
+  4. **Causality**: Cannot reconstruct events outside past light cone
+  5. **Uniqueness**: Multiple past states may be consistent with current observations
+</Warning>
+
+### Common Pitfalls
+
+<Tabs>
+  <Tab title="Over-interpretation">
+    **Problem**: Seeing patterns in noise
+
+    **Solution**:
+    - Always check statistical significance
+    - Use multiple reconstruction methods
+    - Validate with synthetic data
+  </Tab>
+
+  <Tab title="Insufficient Data">
+    **Problem**: Too few measurement points
+
+    **Solution**:
+    - Increase detector sampling rate
+    - Use longer measurement windows
+    - Add more detectors
+  </Tab>
+
+  <Tab title="Systematic Errors">
+    **Problem**: Calibration drift corrupts reconstruction
+
+    **Solution**:
+    - Frequent recalibration
+    - Cross-validation between detectors
+    - Monitor calibration stability
+  </Tab>
+</Tabs>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Temporal Analysis" icon="chart-line" href="/ai-tools/temporal-analysis">
+    Analyzing reconstructed data
+  </Card>
+  <Card title="Chronostasis Protocols" icon="pause" href="/ai-tools/chronostasis-protocols">
+    Advanced temporal control techniques
+  </Card>
+</CardGroup>

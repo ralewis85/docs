@@ -1,0 +1,276 @@
+---
+title: "Resonance Theory"
+description: "The principles of temporal field resonance and harmonic manipulation"
+---
+
+## Fundamentals of Temporal Resonance
+
+Temporal resonance occurs when an external frequency source matches one of the natural harmonic frequencies of a temporal field. This sympathetic vibration can amplify, dampen, or shift the local temporal field characteristics.
+
+<Info>
+  The first controlled temporal resonance was achieved on March 15, 1997 at the Heisenberg Institute by Dr. Marcus Chen using a prototype TR-1000 resonator.
+</Info>
+
+## Harmonic Series
+
+Every temporal field supports a series of resonant frequencies based on its base temporal frequency (BTF):
+
+```
+f_n = f_0 × (n × φ)
+```
+
+Where:
+- `f_n` = nth harmonic frequency
+- `f_0` = base temporal frequency
+- `n` = harmonic number (positive integer)
+- `φ` = golden ratio (1.618033988...)
+
+The use of the golden ratio ensures maximum field stability and minimum destructive interference.
+
+### Primary Harmonics
+
+<Tabs>
+  <Tab title="First Harmonic">
+    **Frequency**: BTF × 1.618
+
+    **Effect**: Mild temporal acceleration (1.001× - 1.005×)
+
+    **Applications**:
+    - Precision timing calibration
+    - Temporal field mapping
+    - Observer synchronization
+
+    **Safety**: Low risk, suitable for Level 2 practitioners
+  </Tab>
+
+  <Tab title="Second Harmonic">
+    **Frequency**: BTF × 3.236
+
+    **Effect**: Moderate temporal distortion (1.01× - 1.05×)
+
+    **Applications**:
+    - Event reconstruction
+    - Temporal analysis
+    - Field stabilization
+
+    **Safety**: Moderate risk, requires Level 3 certification
+  </Tab>
+
+  <Tab title="Third Harmonic">
+    **Frequency**: BTF × 5.236
+
+    **Effect**: Significant temporal manipulation (1.1× - 1.5×)
+
+    **Applications**:
+    - Advanced research
+    - Chronostasis protocols
+    - Temporal shielding
+
+    **Safety**: High risk, Level 4+ only, enhanced shielding required
+  </Tab>
+</Tabs>
+
+## Resonance Modes
+
+### Sympathetic Resonance
+
+When a resonator matches a harmonic frequency precisely, energy transfers efficiently into the temporal field with minimal losses.
+
+```python
+from tre_sdk import Resonator, TemporalField
+
+# Measure field and calculate target
+field = TemporalField.measure()
+target = field.base_frequency * 1.618
+
+# Engage sympathetic resonance
+resonator = Resonator.connect('/dev/tres0')
+resonator.set_frequency(target)
+resonator.set_mode('sympathetic')
+resonator.set_power(0.3)
+```
+
+### Destructive Resonance
+
+Intentionally using out-of-phase frequencies to dampen or suppress temporal field fluctuations.
+
+<Warning>
+  Destructive resonance can cause field fragmentation if not properly controlled. Always monitor coherence levels.
+</Warning>
+
+```python
+# Dampening an unstable field region
+resonator.set_frequency(target)
+resonator.set_phase(math.pi)  # 180 degrees out of phase
+resonator.set_mode('destructive')
+resonator.set_power(0.2)
+```
+
+### Cascade Resonance
+
+Simultaneously exciting multiple harmonics to create complex temporal field effects.
+
+<Warning>
+  **EXTREMELY DANGEROUS**
+
+  Cascade resonance can lead to uncontrolled temporal feedback loops. Only attempt under controlled laboratory conditions with Level 5 supervision.
+</Warning>
+
+## Resonance Coupling
+
+The strength of resonance coupling depends on several factors:
+
+<Steps>
+  <Step title="Frequency Precision">
+    Frequency must match target harmonic within ±0.001 GHz
+
+    ```python
+    # Check frequency lock status
+    status = resonator.get_lock_status()
+    print(f"Frequency error: {status.frequency_error} GHz")
+    print(f"Lock quality: {status.lock_quality}")
+    ```
+  </Step>
+
+  <Step title="Power Calibration">
+    Power levels must be tuned to field strength
+
+    ```python
+    # Auto-calibrate power for optimal coupling
+    field_strength = field.measure_strength()
+    optimal_power = resonator.calculate_optimal_power(field_strength)
+    resonator.set_power(optimal_power)
+    ```
+  </Step>
+
+  <Step title="Phase Alignment">
+    Phase must be synchronized with field oscillation
+
+    ```python
+    # Automatic phase alignment
+    resonator.enable_phase_lock()
+    resonator.wait_for_phase_lock(timeout=30)
+    ```
+  </Step>
+</Steps>
+
+## Coupling Coefficient
+
+The coupling coefficient `C` determines the efficiency of energy transfer:
+
+```
+C = (P_field / P_resonator) × cos(Δφ)
+```
+
+Where:
+- `P_field` = power absorbed by field
+- `P_resonator` = power output by resonator
+- `Δφ` = phase difference
+
+Optimal coupling occurs when `C ≥ 0.95`.
+
+```python
+# Monitor coupling efficiency
+metrics = resonator.get_metrics()
+coupling = metrics.coupling_coefficient
+
+if coupling < 0.95:
+    print("⚠️ Suboptimal coupling, adjusting parameters...")
+    resonator.auto_tune()
+```
+
+## Resonance Effects
+
+### Temporal Acceleration
+
+Positive resonance increases the local temporal frequency, causing time to flow faster relative to baseline.
+
+<Info>
+  A 1% increase in temporal frequency means 1 second of subjective time passes in 0.99 seconds of external time.
+</Info>
+
+### Temporal Deceleration
+
+Negative resonance (destructive interference) decreases local temporal frequency.
+
+### Field Coherence
+
+Resonance affects the coherence of the temporal field. High coherence = stable, predictable behavior.
+
+```python
+# Coherence monitoring during resonance
+def monitor_resonance(duration):
+    start_time = time.time()
+
+    while time.time() - start_time < duration:
+        coherence = field.measure_coherence()
+        print(f"Coherence: {coherence:.3f}")
+
+        if coherence < 0.85:
+            resonator.reduce_power(0.05)
+        elif coherence > 0.98:
+            resonator.increase_power(0.02)
+
+        time.sleep(5)
+```
+
+## Practical Applications
+
+<CardGroup cols={2}>
+  <Card title="Temporal Precision" icon="crosshairs">
+    Using first harmonic resonance for ultra-precise timing systems
+  </Card>
+  <Card title="Event Analysis" icon="magnifying-glass">
+    Second harmonic resonance for examining past temporal field states
+  </Card>
+  <Card title="Field Shaping" icon="wand-magic-sparkles">
+    Creating custom temporal field geometries through multi-harmonic resonance
+  </Card>
+  <Card title="Chronostasis" icon="pause">
+    Advanced technique for creating localized temporal stability zones
+  </Card>
+</CardGroup>
+
+## Resonance Instabilities
+
+### Beat Frequency
+
+When two close but non-matching frequencies interfere:
+
+```
+f_beat = |f_1 - f_2|
+```
+
+Beat frequencies cause periodic oscillations in field strength. Avoid by maintaining precise frequency lock.
+
+### Feedback Loops
+
+If resonator frequency drifts into unintended harmonics, positive feedback can occur:
+
+```python
+# Feedback detection and prevention
+monitor = FeedbackMonitor(resonator, field)
+
+if monitor.detect_feedback():
+    resonator.emergency_stop()
+    print("⛔ Feedback loop detected - emergency shutdown")
+```
+
+### Harmonic Cross-Coupling
+
+Multiple resonators operating simultaneously can create unintended harmonic interactions:
+
+<Warning>
+  Never operate more than one resonator in the same shielded environment without coordinated frequency management.
+</Warning>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Frequency Manipulation" icon="sliders" href="/essentials/frequency-manipulation">
+    Learn advanced frequency control techniques
+  </Card>
+  <Card title="Quantum Bridging" icon="bridge" href="/essentials/quantum-bridging">
+    Cross-temporal quantum entanglement methods
+  </Card>
+</CardGroup>

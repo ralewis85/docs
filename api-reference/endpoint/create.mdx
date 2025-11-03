@@ -1,4 +1,10 @@
 ---
-title: 'Create Plant'
-openapi: 'POST /plants'
+title: 'Engage Resonator'
+openapi: 'POST /resonators/{id}/engage'
 ---
+
+Engage a temporal resonator with specified frequency and power parameters.
+
+<Warning>
+  Requires `operator` role or higher. All safety checks must pass before engagement.
+</Warning>

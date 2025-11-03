@@ -1,0 +1,561 @@
+---
+title: "Field Detection Systems"
+description: "Temporal field measurement and monitoring equipment"
+---
+
+## Overview
+
+Temporal field detectors are precision instruments that measure the characteristics of temporal fields with femtosecond resolution. They are essential for all TRE operations, providing real-time feedback on field state and stability.
+
+<Info>
+  Unlike resonators which *manipulate* temporal fields, detectors *observe* them. Both are required for safe TRE practice.
+</Info>
+
+## Detector Types
+
+### Point Detectors
+
+Measure temporal field characteristics at a single location.
+
+<Tabs>
+  <Tab title="TFD-100 (Basic)">
+    **Specifications**:
+    - Temporal resolution: 0.1 femtoseconds
+    - Frequency range: 1-10 GHz
+    - Sample rate: 100 Hz
+    - Coherence measurement: Yes (basic)
+    - Interface: USB 2.0
+    - Power: USB powered
+    - Price: $2,500
+
+    **Setup**:
+    ```bash
+    # Connect TFD-100
+    tre-cli detector scan
+    # Output: /dev/tfd0 - TFD-100
+
+    # Calibrate
+    tre-cli detector calibrate --device /dev/tfd0
+
+    # Start measurement
+    tre-cli detector measure --device /dev/tfd0 \
+      --continuous \
+      --output realtime.csv
+    ```
+
+    **Best For**: Training, simple experiments, budget setups
+  </Tab>
+
+  <Tab title="TFD-500 (Professional)">
+    **Specifications**:
+    - Temporal resolution: 0.01 femtoseconds
+    - Frequency range: 0.1-50 GHz
+    - Sample rate: 1 kHz
+    - Coherence measurement: Advanced
+    - Spectral analysis: Yes
+    - Interface: GigE, USB 3.0
+    - Power: AC adapter (12V, 2A)
+    - Price: $15,000
+
+    **Advanced Features**:
+    ```python
+    from tre_sdk import TFD500
+
+    detector = TFD500.connect('/dev/tfd0')
+
+    # Multi-parameter measurement
+    measurement = detector.measure_all()
+    print(f"BTF: {measurement.base_frequency} GHz")
+    print(f"Variance: {measurement.variance} fs")
+    print(f"Coherence: {measurement.coherence}")
+    print(f"Harmonic content: {measurement.harmonics}")
+
+    # Spectral analysis
+    spectrum = detector.measure_spectrum(
+        fmin=0,
+        fmax=50,
+        resolution=0.01
+    )
+    spectrum.plot()
+    ```
+
+    **Best For**: Professional research, harmonic analysis, continuous monitoring
+  </Tab>
+
+  <Tab title="TFD-X (Research)">
+    **Specifications**:
+    - Temporal resolution: 0.001 femtoseconds (attosecond-scale)
+    - Frequency range: 0.001-200 GHz
+    - Sample rate: 10 kHz
+    - Coherence measurement: Full quantum
+    - Spectral analysis: Real-time DSP
+    - Hyperdimensional sensing: 7D capable
+    - Interface: 10 GbE, PCIe
+    - Power: AC (100W)
+    - Price: $125,000
+
+    **Research Capabilities**:
+    ```python
+    from tre_sdk import TFDX
+
+    detector = TFDX.connect('/dev/tfdx0')
+
+    # Hyperdimensional measurement
+    hd_field = detector.measure_hyperdimensional(dims=7)
+
+    for d in range(4, 8):
+        print(f"Dimension {d}: {hd_field.amplitude(d)}")
+
+    # Quantum coherence measurement
+    qc = detector.measure_quantum_coherence()
+    print(f"Quantum coherence: {qc.value}")
+    print(f"Decoherence rate: {qc.decoherence_rate} Hz")
+    ```
+
+    **Best For**: Cutting-edge research, quantum bridging, hyperdimensional studies
+  </Tab>
+</Tabs>
+
+### Array Detectors
+
+Multiple sensors for spatial field mapping.
+
+#### TFD-Array-8
+
+<Tabs>
+  <Tab title="Overview">
+    8-channel detector array for 2D and 3D field mapping.
+
+    **Configuration**:
+    - 8 independent TFD-500-class sensors
+    - Software-configurable geometry
+    - Synchronized sampling
+    - Built-in spatial interpolation
+    - Real-time 3D visualization
+  </Tab>
+
+  <Tab title="Setup">
+    ```python
+    from tre_sdk import TFDArray
+
+    array = TFDArray.connect('/dev/tfd-array0')
+
+    # Configure cubic geometry
+    array.set_geometry('cube', edge_length=1.0)  # 1 meter cube
+
+    # Calibrate spatial positioning
+    array.calibrate_positions(
+        method='laser-ranging',
+        accuracy=0.001  # 1mm
+    )
+
+    # Start synchronized measurement
+    array.start_measurement(sample_rate=1000)
+    ```
+  </Tab>
+
+  <Tab title="Field Mapping">
+    ```python
+    # Measure 3D field structure
+    field_map = array.measure_volume(duration=60)
+
+    # Generate 3D visualization
+    field_map.visualize_3d(
+        output='temporal_field_3d.png',
+        colormap='viridis',
+        show_isosurfaces=True
+    )
+
+    # Extract field characteristics
+    print(f"Field uniformity: {field_map.uniformity}")
+    print(f"Gradient max: {field_map.gradient_magnitude.max()}")
+
+    # Identify anomalies
+    anomalies = field_map.find_anomalies(threshold=0.1)
+    for a in anomalies:
+        print(f"Anomaly at {a.position}: {a.severity}")
+    ```
+  </Tab>
+
+  <Tab title="Applications">
+    <CardGroup cols={2}>
+      <Card title="Resonator Tuning" icon="sliders">
+        Optimize resonator positioning and orientation
+      </Card>
+      <Card title="Shield Verification" icon="shield">
+        Verify Faraday-Heisenberg shielding effectiveness
+      </Card>
+      <Card title="Field Tomography" icon="cube">
+        3D reconstruction of temporal field topology
+      </Card>
+      <Card title="Anomaly Detection" icon="triangle-exclamation">
+        Identify and characterize field instabilities
+      </Card>
+    </CardGroup>
+  </Tab>
+</Tabs>
+
+## Measurement Techniques
+
+### Basic Measurements
+
+```python
+from tre_sdk import TemporalField, Detector
+
+detector = Detector.connect('/dev/tfd0')
+
+# Measure current field state
+field = TemporalField.measure(detector)
+
+print(f"Base frequency: {field.base_frequency} GHz")
+print(f"Temporal variance: {field.variance} fs")
+print(f"Field strength: {field.strength} nT")  # nanoTesla
+```
+
+### Time-Series Analysis
+
+```python
+# Collect time series data
+detector.start_acquisition(duration=300)  # 5 minutes
+
+# Wait for completion
+while detector.is_acquiring():
+    progress = detector.get_progress()
+    print(f"Progress: {progress:.1f}%")
+    time.sleep(1)
+
+# Retrieve data
+timeseries = detector.get_timeseries()
+
+# Analyze
+from tre_sdk.analysis import TimeSeriesAnalyzer
+
+analyzer = TimeSeriesAnalyzer(timeseries)
+
+print(f"Mean BTF: {analyzer.mean()}")
+print(f"Standard deviation: {analyzer.std()}")
+print(f"Drift rate: {analyzer.linear_drift()} GHz/s")
+
+# Plot
+analyzer.plot(
+    output='timeseries.png',
+    show_trend=True,
+    show_spectrum=True
+)
+```
+
+### Spectral Analysis
+
+```python
+# Measure frequency spectrum
+spectrum = detector.measure_spectrum(
+    duration=60,
+    fmin=0,
+    fmax=20,
+    resolution=0.001
+)
+
+# Identify peaks
+peaks = spectrum.find_peaks(threshold=0.1)
+
+for peak in peaks:
+    print(f"Peak at {peak.frequency} GHz")
+    print(f"  Amplitude: {peak.amplitude}")
+    print(f"  Width: {peak.width} GHz")
+    print(f"  Q-factor: {peak.q_factor}")
+
+# Harmonic analysis
+harmonics = spectrum.identify_harmonics(
+    base_frequency=field.base_frequency
+)
+
+print(f"Detected {len(harmonics)} harmonics")
+```
+
+### Coherence Measurement
+
+```python
+# Measure temporal coherence
+coherence = detector.measure_coherence(
+    method='multi-tau',
+    max_tau=1.0  # 1 second
+)
+
+# Plot coherence function
+coherence.plot(
+    output='coherence.png',
+    log_scale=True
+)
+
+# Calculate coherence time
+coherence_time = coherence.calculate_coherence_time()
+print(f"Coherence time: {coherence_time} ms")
+```
+
+## Advanced Detection
+
+### Heterodyne Detection
+
+For ultra-sensitive measurements:
+
+```python
+from tre_sdk.advanced import HeterodyneDetector
+
+hetdet = HeterodyneDetector(detector)
+
+# Set local oscillator
+hetdet.set_local_oscillator(
+    frequency=2.847,  # GHz
+    power=0.001  # watts
+)
+
+# Measure with heterodyne
+measurement = hetdet.measure(
+    if_bandwidth=0.01,  # 10 MHz intermediate frequency bandwidth
+    integration_time=10  # seconds
+)
+
+print(f"Sensitivity: {measurement.sensitivity} fT/√Hz")
+print(f"SNR: {measurement.snr} dB")
+```
+
+### Quantum-Enhanced Detection
+
+Using entangled photons for noise reduction:
+
+<Warning>
+  Quantum-enhanced detection requires Level 4 certification and specialized equipment.
+</Warning>
+
+```python
+from tre_sdk.quantum import QuantumEnhancedDetector
+
+qdetector = QuantumEnhancedDetector(detector)
+
+# Prepare squeezed states
+qdetector.prepare_squeezed_state(
+    squeezing=10  # dB
+)
+
+# Measure with quantum enhancement
+qmeasurement = qdetector.measure(
+    duration=60,
+    entanglement='two-mode'
+)
+
+print(f"Quantum advantage: {qmeasurement.quantum_advantage} dB")
+print(f"Effective sensitivity: {qmeasurement.sensitivity} aT/√Hz")
+```
+
+## Calibration
+
+### Factory Calibration
+
+All detectors ship with factory calibration valid for 1 year.
+
+```bash
+# Check calibration status
+tre-cli detector calibration status --device /dev/tfd0
+
+# Output example:
+# Last calibration: 2024-06-15
+# Days remaining: 287
+# Status: VALID
+# Traceability: NIST-23-0451
+```
+
+### Field Calibration
+
+Monthly field calibration is recommended:
+
+<Steps>
+  <Step title="Null calibration">
+    Calibrate in a known null-field environment:
+
+    ```bash
+    # Enter null chamber
+    tre-cli detector calibrate --device /dev/tfd0 \
+      --type null \
+      --duration 600
+    ```
+  </Step>
+
+  <Step title="Reference calibration">
+    Calibrate against a known reference field:
+
+    ```bash
+    # Use calibrated field source
+    tre-cli detector calibrate --device /dev/tfd0 \
+      --type reference \
+      --source NIST-TF-REF-01 \
+      --duration 600
+    ```
+  </Step>
+
+  <Step title="Verification">
+    Verify calibration accuracy:
+
+    ```bash
+    tre-cli detector verify --device /dev/tfd0
+    # Should show error < 0.1%
+    ```
+  </Step>
+</Steps>
+
+### Cross-Calibration
+
+For detector arrays, cross-calibration ensures consistency:
+
+```python
+from tre_sdk import DetectorArray
+
+array = DetectorArray([
+    TFD500.connect('/dev/tfd0'),
+    TFD500.connect('/dev/tfd1'),
+    TFD500.connect('/dev/tfd2')
+])
+
+# Cross-calibrate
+array.cross_calibrate(
+    duration=300,
+    iterations=10
+)
+
+# Verify uniformity
+uniformity = array.measure_uniformity()
+print(f"Array uniformity: {uniformity:.4f}")
+# Should be > 0.99
+```
+
+## Data Management
+
+### Data Logging
+
+```python
+from tre_sdk import DataLogger
+
+logger = DataLogger(detector)
+
+# Configure logging
+logger.set_output_path('/data/tre_measurements')
+logger.set_file_format('hdf5')
+logger.set_compression('lzma')
+
+# Start logging
+logger.start(
+    parameters=['btf', 'variance', 'coherence'],
+    sample_rate=100,  # Hz
+    max_file_size=1e9  # 1 GB
+)
+
+# Automatic rotation and archival
+logger.enable_auto_rotation()
+logger.enable_auto_archive(
+    destination='/data/archive',
+    compression='tar.gz'
+)
+```
+
+### Data Analysis
+
+```python
+from tre_sdk.analysis import DataAnalyzer
+
+# Load logged data
+analyzer = DataAnalyzer.load('/data/tre_measurements/session_001.h5')
+
+# Generate summary report
+report = analyzer.generate_report(
+    include_plots=True,
+    include_statistics=True,
+    include_anomalies=True
+)
+
+report.save('analysis_report.pdf')
+
+# Export for external analysis
+analyzer.export_csv('data_export.csv')
+analyzer.export_matlab('data_export.mat')
+```
+
+## Safety and Best Practices
+
+<AccordionGroup>
+  <Accordion title="Detector Placement" icon="location-dot">
+    - Minimum 0.5m from resonators
+    - Avoid direct resonator beam paths
+    - Stable mounting (vibration < 1 μm)
+    - Temperature-controlled environment (23±1°C)
+  </Accordion>
+
+  <Accordion title="Measurement Protocol" icon="list-check">
+    - Always establish baseline before experiments
+    - Monitor continuously during resonance
+    - Log all measurements
+    - Verify calibration weekly
+    - Report anomalies immediately
+  </Accordion>
+
+  <Accordion title="Data Security" icon="lock">
+    - Encrypt sensitive measurements
+    - Implement access controls
+    - Maintain audit logs
+    - Regular backups
+    - Comply with TRE Council data policies
+  </Accordion>
+</AccordionGroup>
+
+## Troubleshooting
+
+<Tabs>
+  <Tab title="Noisy Measurements">
+    **Symptoms**: High variance in readings
+
+    **Causes**:
+    - Environmental interference
+    - Poor grounding
+    - Vibration
+    - Temperature fluctuations
+
+    **Solutions**:
+    ```bash
+    # Check interference
+    tre-cli detector diagnose --noise-analysis
+
+    # Improve grounding
+    tre-cli detector config --ground-mode star
+
+    # Increase averaging
+    tre-cli detector config --averaging 100
+
+    # Temperature compensation
+    tre-cli detector config --temp-compensation on
+    ```
+  </Tab>
+
+  <Tab title="Calibration Drift">
+    **Symptoms**: Measurements diverge from known references
+
+    **Solutions**:
+    ```bash
+    # Recalibrate immediately
+    tre-cli detector calibrate --type full
+
+    # Check for hardware issues
+    tre-cli detector diagnostics --comprehensive
+
+    # If drift persists, return for factory service
+    ```
+  </Tab>
+</Tabs>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Temporal Analysis" icon="chart-line" href="/ai-tools/temporal-analysis">
+    Analyzing detector data
+  </Card>
+  <Card title="Resonator Systems" icon="microchip" href="/essentials/resonators">
+    Resonator specifications
+  </Card>
+</CardGroup>

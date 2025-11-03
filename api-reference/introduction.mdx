@@ -1,33 +1,337 @@
 ---
-title: 'Introduction'
-description: 'Example section for showcasing API endpoints'
+title: 'Resonator Control API'
+description: 'Programmatic interface for temporal resonator systems'
 ---
 
+## Overview
+
+The Resonator Control API provides comprehensive programmatic access to temporal resonator systems, field detectors, and analysis tools. This RESTful API enables automated TRE operations, remote monitoring, and integration with experimental workflows.
+
+<Warning>
+  API access requires valid TRE Council credentials and appropriate certification levels. Unauthorized access attempts are logged and may result in certification revocation.
+</Warning>
+
+## Base URL
+
+```
+https://api.tre-resonator.local:8443/v2
+```
+
 <Note>
-  If you're not looking to build API reference documentation, you can delete
-  this section by removing the api-reference folder.
+  For security, the API only operates on local networks or VPN connections. Internet-facing deployments are prohibited by TRE Council regulations.
 </Note>
-
-## Welcome
-
-There are two ways to build API documentation: [OpenAPI](https://mintlify.com/docs/api-playground/openapi/setup) and [MDX components](https://mintlify.com/docs/api-playground/mdx/configuration). For the starter kit, we are using the following OpenAPI specification.
-
-<Card
-  title="Plant Store Endpoints"
-  icon="leaf"
-  href="https://github.com/mintlify/starter/blob/main/api-reference/openapi.json"
->
-  View the OpenAPI specification file
-</Card>
 
 ## Authentication
 
-All API endpoints are authenticated using Bearer tokens and picked up from the specification file.
+All API endpoints require authentication using API keys with role-based access control.
+
+### Obtaining API Keys
+
+```bash
+# Generate new API key (requires Level 3+ certification)
+tre-cli auth generate-key --name "Lab Automation" --role operator
+
+# Output:
+# API Key: tre_sk_live_7Xk9mPq4nR8wL2jY5vC3sT6hF1dG0bN
+# Secret: tre_secret_aB3cD4eF5gH6iJ7kL8mN9oP0qR1sT2uV3wX4yZ
+# Role: operator
+# Expires: 2025-12-31
+```
+
+### Using API Keys
+
+Include the API key in the `Authorization` header:
+
+```bash
+curl -X GET https://api.tre-resonator.local:8443/v2/resonators \
+  -H "Authorization: Bearer tre_sk_live_7Xk9mPq4nR8wL2jY5vC3sT6hF1dG0bN"
+```
+
+### Access Roles
+
+| Role | Permissions | Certification Required |
+|------|-------------|------------------------|
+| `viewer` | Read-only access | Level 2 |
+| `operator` | Control resonators, read data | Level 3 |
+| `researcher` | Full access, create experiments | Level 4 |
+| `admin` | User management, system config | Level 5 |
+
+## Rate Limits
+
+To ensure system stability, API requests are rate-limited:
+
+- **Viewer**: 100 requests/minute
+- **Operator**: 300 requests/minute
+- **Researcher**: 1000 requests/minute
+- **Admin**: 5000 requests/minute
+
+Rate limit headers are included in all responses:
+
+```http
+X-RateLimit-Limit: 1000
+X-RateLimit-Remaining: 847
+X-RateLimit-Reset: 1640995200
+```
+
+## SDK Libraries
+
+Official SDK libraries are available for common languages:
+
+<CardGroup cols={2}>
+  <Card title="Python SDK" icon="python" href="#python-sdk">
+    ```bash
+    pip install tre-sdk
+    ```
+  </Card>
+  <Card title="JavaScript SDK" icon="js" href="#javascript-sdk">
+    ```bash
+    npm install @tre/sdk
+    ```
+  </Card>
+  <Card title="Go SDK" icon="golang" href="#go-sdk">
+    ```bash
+    go get github.com/tre-institute/go-tre
+    ```
+  </Card>
+  <Card title="Rust SDK" icon="rust" href="#rust-sdk">
+    ```bash
+    cargo add tre-sdk
+    ```
+  </Card>
+</CardGroup>
+
+### Python SDK Example
+
+```python
+from tre_sdk import TREClient
+
+# Initialize client
+client = TREClient(
+    api_key="tre_sk_live_...",
+    base_url="https://api.tre-resonator.local:8443/v2"
+)
+
+# List available resonators
+resonators = client.resonators.list()
+
+for resonator in resonators:
+    print(f"{resonator.id}: {resonator.model} - {resonator.status}")
+
+# Control resonator
+resonator = client.resonators.get("tres_9000_01")
+resonator.set_frequency(2.847)
+resonator.set_power(0.3)
+resonator.engage()
+
+# Read detector data
+detector = client.detectors.get("tfd_500_01")
+measurement = detector.measure()
+print(f"BTF: {measurement.base_frequency} GHz")
+```
+
+### JavaScript SDK Example
+
+```javascript
+import { TREClient } from '@tre/sdk';
+
+const client = new TREClient({
+  apiKey: 'tre_sk_live_...',
+  baseUrl: 'https://api.tre-resonator.local:8443/v2'
+});
+
+// Monitor field in real-time
+const detector = await client.detectors.get('tfd_500_01');
+
+detector.on('measurement', (data) => {
+  console.log(`BTF: ${data.baseFrequency} GHz`);
+  console.log(`Coherence: ${data.coherence}`);
+});
+
+await detector.startContinuousMeasurement({ rate: 10 }); // 10 Hz
+```
+
+## API Endpoints
+
+The Resonator Control API is organized into the following endpoint groups:
+
+<CardGroup cols={2}>
+  <Card title="Resonators" icon="microchip" href="/api-reference/endpoint/create">
+    Control and configure temporal resonators
+  </Card>
+  <Card title="Detectors" icon="radar" href="/api-reference/endpoint/get">
+    Access field detector measurements
+  </Card>
+  <Card title="Experiments" icon="flask" href="/api-reference/endpoint/delete">
+    Manage experimental sessions
+  </Card>
+  <Card title="Webhooks" icon="webhook" href="/api-reference/endpoint/webhook">
+    Receive real-time event notifications
+  </Card>
+</CardGroup>
+
+## Error Handling
+
+The API uses standard HTTP status codes and returns detailed error information:
+
+### Success Codes
+
+- `200 OK` - Request succeeded
+- `201 Created` - Resource created successfully
+- `202 Accepted` - Request accepted, processing asynchronously
+- `204 No Content` - Request succeeded, no content to return
+
+### Client Error Codes
+
+- `400 Bad Request` - Invalid request parameters
+- `401 Unauthorized` - Invalid or missing API key
+- `403 Forbidden` - Insufficient permissions
+- `404 Not Found` - Resource not found
+- `429 Too Many Requests` - Rate limit exceeded
+
+### Server Error Codes
+
+- `500 Internal Server Error` - Unexpected server error
+- `503 Service Unavailable` - Service temporarily unavailable
+
+### Error Response Format
 
 ```json
-"security": [
-  {
-    "bearerAuth": []
+{
+  "error": {
+    "code": "insufficient_coherence",
+    "message": "Cannot engage resonator: field coherence below minimum threshold",
+    "details": {
+      "current_coherence": 0.72,
+      "minimum_required": 0.85,
+      "recommendation": "Improve shielding or reduce external interference"
+    },
+    "doc_url": "https://docs.tre/errors/insufficient_coherence"
   }
-]
+}
 ```
+
+## Safety Features
+
+The API includes multiple safety features:
+
+### Automatic Safety Checks
+
+All resonator control commands are validated against safety parameters:
+
+```json
+{
+  "safety_check": {
+    "coherence_threshold": 0.85,
+    "max_power": 5.0,
+    "max_frequency_rate": 0.05,
+    "observer_clearance": 5.0
+  }
+}
+```
+
+### Emergency Stop
+
+Immediate shutdown endpoint available at all times:
+
+```bash
+POST /v2/emergency-stop
+```
+
+```python
+# Python SDK
+client.emergency_stop()  # Stops all resonators immediately
+```
+
+### Safety Interlocks
+
+Hardware interlocks can be configured via API:
+
+```python
+# Configure safety interlock
+client.safety.configure_interlock(
+    resonator_id="tres_9000_01",
+    conditions={
+        "max_coherence_drop": 0.1,
+        "max_power_deviation": 0.2,
+        "observer_detection": True
+    },
+    action="emergency_stop"
+)
+```
+
+## Websocket Streaming
+
+For real-time data streaming, use the WebSocket API:
+
+```javascript
+const ws = new WebSocket('wss://api.tre-resonator.local:8443/v2/stream');
+
+ws.on('open', () => {
+  // Subscribe to detector stream
+  ws.send(JSON.stringify({
+    action: 'subscribe',
+    channel: 'detector:tfd_500_01',
+    rate: 100  // 100 Hz
+  }));
+});
+
+ws.on('message', (data) => {
+  const measurement = JSON.parse(data);
+  console.log(`BTF: ${measurement.base_frequency}`);
+  console.log(`Coherence: ${measurement.coherence}`);
+});
+```
+
+## Pagination
+
+List endpoints support cursor-based pagination:
+
+```bash
+GET /v2/measurements?limit=100&cursor=eyJpZCI6MTIzNDU2fQ==
+```
+
+Response includes pagination metadata:
+
+```json
+{
+  "data": [...],
+  "pagination": {
+    "has_more": true,
+    "next_cursor": "eyJpZCI6MTIzNTU2fQ==",
+    "total_count": 15847
+  }
+}
+```
+
+## Versioning
+
+The API uses URL-based versioning. The current version is `v2`.
+
+- Backwards-compatible changes may be added to existing versions
+- Breaking changes will result in a new version
+- Deprecated versions are supported for 12 months after deprecation notice
+
+## Support
+
+<CardGroup cols={2}>
+  <Card title="API Status" icon="chart-line" href="#">
+    Monitor API uptime and performance
+  </Card>
+  <Card title="Developer Forum" icon="comments" href="#">
+    Community support and discussions
+  </Card>
+  <Card title="Bug Reports" icon="bug" href="#">
+    Report API issues
+  </Card>
+  <Card title="TRE Council" icon="shield-halved" href="#">
+    Official support and certification
+  </Card>
+</CardGroup>
+
+## Next Steps
+
+Explore the API endpoint documentation:
+
+<Card title="Resonator Endpoints" icon="microchip" href="/api-reference/endpoint/create">
+  Learn how to control resonators via API
+</Card>

@@ -1,4 +1,19 @@
 ---
-title: 'New Plant'
-openapi: 'WEBHOOK /plant/webhook'
+title: 'Configure Webhooks'
+openapi: 'POST /webhooks'
 ---
+
+Configure webhook endpoints to receive real-time notifications about resonator events, field anomalies, and safety alerts.
+
+## Event Types
+
+- `resonator.engaged` - Resonator successfully engaged
+- `resonator.stopped` - Resonator stopped
+- `coherence.warning` - Field coherence dropped below threshold
+- `coherence.critical` - Critical coherence level reached
+- `anomaly.detected` - Field anomaly detected
+- `safety.emergency_stop` - Emergency stop triggered
+
+<Warning>
+  Webhook endpoints must respond within 3 seconds to avoid timeout.
+</Warning>

@@ -1,0 +1,527 @@
+---
+title: "Resonator Systems"
+description: "Specifications and operating procedures for temporal resonator hardware"
+---
+
+## Temporal Resonator Overview
+
+Temporal resonators are specialized devices that generate precisely tuned electromagnetic fields capable of inducing resonance in temporal field structures. They are the primary tool for all TRE operations.
+
+<Info>
+  The first functional temporal resonator (TR-1000) was developed in 1996 by the Heisenberg Institute. Modern resonators are 1000× more powerful and precise.
+</Info>
+
+## Resonator Series
+
+### TR-7000 Series (Entry Level)
+
+<Tabs>
+  <Tab title="Specifications">
+    **Frequency Range**: 1.0 - 10.0 GHz
+
+    **Power Output**: 0.1 - 5.0 watts
+
+    **Frequency Stability**: ±0.001 GHz
+
+    **Phase Noise**: -120 dBc/Hz @ 10 kHz
+
+    **Tuning Speed**: 1.0 GHz/s maximum
+
+    **Interface**: USB 3.0, Ethernet
+
+    **Dimensions**: 30 × 20 × 10 cm
+
+    **Weight**: 3.5 kg
+
+    **Power**: 120-240V AC, 150W max
+  </Tab>
+
+  <Tab title="Features">
+    - Single-channel operation
+    - Manual frequency control
+    - Basic coherence monitoring
+    - Emergency shutdown button
+    - Compatible with standard shielding
+
+    **Best For**:
+    - Training and education (Level 2-3)
+    - First harmonic resonance only
+    - Low-risk experiments
+    - Budget-conscious laboratories
+  </Tab>
+
+  <Tab title="Setup">
+    ```bash
+    # Install TR-7000 drivers
+    sudo apt install tre-drivers-7000
+
+    # Connect via USB
+    tre-cli device scan
+    # Should show: /dev/tres0 - TR-7000 (Serial: TR7-XXXXX)
+
+    # Initialize
+    tre-cli resonator init --device /dev/tres0
+
+    # Run self-test
+    tre-cli resonator test --comprehensive
+    ```
+
+    <Note>TR-7000 requires calibration every 30 days of operation</Note>
+  </Tab>
+
+  <Tab title="Limitations">
+    <Warning>
+      **Not Suitable For**:
+      - Second harmonic and above
+      - Multi-resonator arrays
+      - Quantum bridging operations
+      - Continuous operation > 2 hours
+      - Research-grade measurements
+    </Warning>
+  </Tab>
+</Tabs>
+
+### TR-9000 Series (Professional)
+
+<Tabs>
+  <Tab title="Specifications">
+    **Frequency Range**: 0.1 - 50.0 GHz
+
+    **Power Output**: 0.01 - 25.0 watts
+
+    **Frequency Stability**: ±0.0001 GHz
+
+    **Phase Noise**: -145 dBc/Hz @ 10 kHz
+
+    **Tuning Speed**: 10.0 GHz/s maximum
+
+    **Interface**: 10 GbE, PCIe x4, USB-C
+
+    **Dimensions**: 45 × 30 × 15 cm
+
+    **Weight**: 8.2 kg
+
+    **Power**: 100-240V AC, 500W max
+
+    **Cooling**: Active liquid cooling
+  </Tab>
+
+  <Tab title="Features">
+    - Dual-channel operation
+    - Automated frequency sweeping
+    - Real-time coherence analysis
+    - Hardware safety interlocks
+    - Built-in field detector interface
+    - Remote operation capable
+    - Data logging and export
+
+    **Best For**:
+    - Professional research (Level 3-4)
+    - Up to third harmonic resonance
+    - Multi-hour continuous operation
+    - Moderate quantum bridging
+  </Tab>
+
+  <Tab title="Setup">
+    ```bash
+    # Install professional suite
+    sudo apt install tre-professional-suite
+
+    # Connect via 10 GbE for best performance
+    tre-cli device scan --interface ethernet
+
+    # Configure networking
+    tre-cli device config --device /dev/tres0 \
+      --ip 192.168.1.100 \
+      --mode low-latency
+
+    # Initialize with calibration
+    tre-cli resonator init --device /dev/tres0 \
+      --calibrate --reference external
+
+    # Enable safety interlocks
+    tre-cli safety enable-all --device /dev/tres0
+    ```
+  </Tab>
+
+  <Tab title="Advanced Features">
+    **Frequency Synthesis**:
+    ```python
+    from tre_sdk import TR9000
+
+    resonator = TR9000.connect('/dev/tres0')
+
+    # Multi-tone generation
+    resonator.synthesizer.add_tone(2.847, power=0.5)
+    resonator.synthesizer.add_tone(4.605, power=0.3)
+    resonator.synthesizer.add_tone(7.452, power=0.2)
+
+    resonator.synthesizer.engage()
+    ```
+
+    **Arbitrary Waveforms**:
+    ```python
+    # Load custom waveform
+    waveform = resonator.waveform.create(
+        duration=0.001,  # 1ms
+        sample_rate=1e9  # 1 GS/s
+    )
+
+    # Define custom pattern
+    waveform.set_pattern([
+        (0, 2.847),     # time, frequency
+        (0.0005, 3.5),
+        (0.001, 2.847)
+    ])
+
+    resonator.waveform.upload(waveform)
+    resonator.waveform.play(repeat=True)
+    ```
+  </Tab>
+</Tabs>
+
+### TR-X Series (Research Grade)
+
+<Warning>
+  TR-X series requires Level 5 certification and TRE Council authorization to operate.
+</Warning>
+
+<Tabs>
+  <Tab title="Specifications">
+    **Frequency Range**: 0.001 - 200.0 GHz
+
+    **Power Output**: 0.001 - 100.0 watts
+
+    **Frequency Stability**: ±0.00001 GHz
+
+    **Phase Noise**: -165 dBc/Hz @ 10 kHz
+
+    **Tuning Speed**: 100.0 GHz/s maximum
+
+    **Interface**: 100 GbE, PCIe x16, RDMA
+
+    **Dimensions**: 60 × 50 × 25 cm (main unit)
+
+    **Weight**: 18.7 kg
+
+    **Power**: 200-240V 3-phase, 2000W max
+
+    **Cooling**: Closed-loop chilled water
+  </Tab>
+
+  <Tab title="Features">
+    - Quad-channel operation
+    - Full quantum bridge support
+    - Hyperdimensional field access
+    - AI-assisted optimization
+    - Integrated safety AI
+    - Distributed operation modes
+    - Real-time DSP processing
+
+    **Capabilities**:
+    - All harmonic resonances
+    - Multi-temporal entanglement
+    - Recursive bridging
+    - Arbitrary field shaping
+    - Continuous operation (weeks)
+  </Tab>
+
+  <Tab title="Setup">
+    ```bash
+    # Requires specialized installation team
+    # Contact TRE Council for installation scheduling
+
+    # After professional installation:
+    tre-cli device scan --research-grade
+
+    # Multi-stage initialization
+    tre-cli resonator init --device /dev/tresx0 \
+      --stage pre-cool
+    # Wait for cooling system stabilization (30 minutes)
+
+    tre-cli resonator init --device /dev/tresx0 \
+      --stage calibration \
+      --reference atomic-clock
+
+    tre-cli resonator init --device /dev/tresx0 \
+      --stage verification \
+      --full-suite
+
+    # Enable AI-assisted safety
+    tre-cli safety enable-ai --device /dev/tresx0 \
+      --model advanced \
+      --prediction-horizon 5.0
+    ```
+  </Tab>
+
+  <Tab title="Advanced Capabilities">
+    **Quantum Bridge Management**:
+    ```python
+    from tre_sdk import TRX
+
+    resonator = TRX.connect('/dev/tresx0')
+
+    # Automatically manage quantum bridge
+    bridge = resonator.quantum.create_bridge(
+        temporal_offset=0.1,
+        target_coherence=0.98,
+        auto_stabilize=True
+    )
+
+    # AI-optimized field shaping
+    field_shape = resonator.ai.optimize_field_shape(
+        target='chronostasis',
+        constraints={
+            'radius': 1.0,
+            'coherence_min': 0.95,
+            'power_budget': 50.0
+        }
+    )
+
+    resonator.apply_field_shape(field_shape)
+    ```
+  </Tab>
+</Tabs>
+
+## Resonator Arrays
+
+Multiple resonators can be coordinated for advanced operations.
+
+### Array Configurations
+
+<CardGroup cols={2}>
+  <Card title="Linear Array" icon="arrows-left-right">
+    2-8 resonators in a line
+
+    **Applications**: Directional temporal beams, interference patterns
+  </Card>
+  <Card title="Triangular Array" icon="triangle">
+    3 resonators in equilateral triangle
+
+    **Applications**: 2D field shaping, focused effects
+  </Card>
+  <Card title="Tetrahedral Array" icon="cube">
+    4 resonators in tetrahedron
+
+    **Applications**: 3D field control, omnidirectional shielding
+  </Card>
+  <Card title="Custom Geometry" icon="shapes">
+    Arbitrary positioning
+
+    **Applications**: Specialized research applications
+  </Card>
+</CardGroup>
+
+### Array Setup
+
+```python
+from tre_sdk import ResonatorArray
+
+# Define array geometry
+array = ResonatorArray([
+    '/dev/tres0',
+    '/dev/tres1',
+    '/dev/tres2'
+])
+
+# Configure triangular geometry
+array.set_geometry(
+    type='triangular',
+    spacing=2.0,  # meters
+    orientation=(0, 0, 0)  # euler angles
+)
+
+# Synchronize phase across array
+array.synchronize_phase(
+    reference='/dev/tres0',
+    tolerance=0.1  # degrees
+)
+
+# Test array coherence
+coherence = array.test_coherence()
+print(f"Array coherence: {coherence:.4f}")
+```
+
+## Maintenance and Calibration
+
+### Daily Maintenance
+
+<AccordionGroup>
+  <Accordion title="Pre-Operation Checks" icon="list-check">
+    ```bash
+    # Run daily self-test
+    tre-cli resonator test --daily --device /dev/tres0
+
+    # Check calibration status
+    tre-cli calibration status
+
+    # Verify cooling system
+    tre-cli cooling check
+
+    # Test safety interlocks
+    tre-cli safety test
+    ```
+  </Accordion>
+
+  <Accordion title="Post-Operation" icon="power-off">
+    ```bash
+    # Gradual shutdown
+    tre-cli resonator shutdown --gradual --duration 60
+
+    # Save operation log
+    tre-cli log export --session today \
+      --output /data/logs/$(date +%Y%m%d).log
+
+    # Clear any error flags
+    tre-cli errors clear --device /dev/tres0
+    ```
+  </Accordion>
+</AccordionGroup>
+
+### Monthly Calibration
+
+<Steps>
+  <Step title="Frequency calibration">
+    ```bash
+    # Connect to GPS-disciplined atomic clock
+    tre-cli calibration frequency \
+      --reference gps-clock \
+      --duration 3600
+
+    # Verify against NIST standard
+    tre-cli calibration verify --standard NIST
+    ```
+  </Step>
+
+  <Step title="Power calibration">
+    ```bash
+    # Calibrate power output
+    tre-cli calibration power \
+      --reference-meter PM-5000 \
+      --points 50
+
+    # Verify linearity
+    tre-cli calibration verify-linearity
+    ```
+  </Step>
+
+  <Step title="Phase calibration">
+    ```bash
+    # Calibrate phase accuracy
+    tre-cli calibration phase \
+      --reference vector-network-analyzer \
+      --frequency-points 100
+    ```
+  </Step>
+</Steps>
+
+### Annual Service
+
+<Warning>
+  Annual service must be performed by certified TRE Council technicians. Attempting DIY service voids warranty and certification.
+</Warning>
+
+Annual service includes:
+- Complete hardware inspection
+- Firmware updates
+- Component replacement (as needed)
+- Full recertification
+- Safety system validation
+- Performance benchmarking
+
+## Troubleshooting
+
+<Tabs>
+  <Tab title="Frequency Lock Issues">
+    **Symptoms**: Cannot achieve frequency lock
+
+    **Diagnostics**:
+    ```bash
+    tre-cli diagnostics frequency --device /dev/tres0
+    ```
+
+    **Common Causes**:
+    - PLL bandwidth too narrow
+    - Reference oscillator drift
+    - Temperature instability
+    - External interference
+
+    **Solutions**:
+    ```bash
+    # Increase PLL bandwidth
+    tre-cli config set pll.bandwidth 0.1
+
+    # Recalibrate reference
+    tre-cli calibration reference --auto
+
+    # Check temperature
+    tre-cli sensors temperature
+    # Should be 23±1°C
+    ```
+  </Tab>
+
+  <Tab title="Power Output Issues">
+    **Symptoms**: Insufficient or unstable power output
+
+    **Diagnostics**:
+    ```bash
+    tre-cli diagnostics power --sweep --device /dev/tres0
+    ```
+
+    **Common Causes**:
+    - Amplifier saturation
+    - Cooling system inadequate
+    - Power supply voltage droop
+    - Cable/connector issues
+
+    **Solutions**:
+    ```bash
+    # Check amplifier status
+    tre-cli diagnostics amplifier
+
+    # Verify cooling
+    tre-cli cooling verify --flow-rate --temperature
+
+    # Test power supply
+    tre-cli diagnostics power-supply
+
+    # Inspect connections
+    tre-cli diagnostics connections
+    ```
+  </Tab>
+
+  <Tab title="Communication Errors">
+    **Symptoms**: Device not responding or intermittent connectivity
+
+    **Diagnostics**:
+    ```bash
+    tre-cli diagnostics communication --device /dev/tres0
+    ```
+
+    **Solutions**:
+    ```bash
+    # Reset USB connection
+    tre-cli device reset --interface usb
+
+    # Reload drivers
+    sudo modprobe -r tre_usb
+    sudo modprobe tre_usb
+
+    # Check firmware version
+    tre-cli firmware version
+    # Update if needed
+    tre-cli firmware update --latest
+    ```
+  </Tab>
+</Tabs>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Field Detectors" icon="radar" href="/essentials/field-detectors">
+    Learn about temporal field measurement equipment
+  </Card>
+  <Card title="Resonator API" icon="code" href="/api-reference/introduction">
+    Programmatic control of resonators
+  </Card>
+</CardGroup>

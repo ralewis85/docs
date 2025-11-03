@@ -1,10 +1,50 @@
 ---
 title: 'Stop Resonator'
-openapi: 'POST /resonators/{id}/stop'
+description: 'POST /resonators/{id}/stop - Stop a running resonator'
 ---
+
+## Endpoint
+
+```
+POST /v2/resonators/{id}/stop
+```
 
 Gracefully stop a running resonator. For emergency situations, use the emergency stop endpoint instead.
 
 <Note>
   Gradual power reduction takes approximately 60 seconds to complete safely.
 </Note>
+
+## Request Parameters
+
+### Path Parameters
+
+- `id` (string, required) - Resonator device ID (e.g., `tres_9000_01`)
+
+### Body Parameters
+
+```json
+{
+  "mode": "gradual",
+  "duration": 60
+}
+```
+
+- `mode` (string, optional) - Shutdown mode: `gradual`, `fast`, default: `gradual`
+- `duration` (number, optional) - Shutdown duration in seconds, default: 60
+
+## Response
+
+### Success Response (200 OK)
+
+```json
+{
+  "status": "stopping",
+  "resonator_id": "tres_9000_01",
+  "estimated_completion": "2024-11-03T15:31:00Z"
+}
+```
+
+### Success Response (204 No Content)
+
+When shutdown is complete.

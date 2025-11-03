@@ -1,10 +1,68 @@
 ---
 title: 'Engage Resonator'
-openapi: 'POST /resonators/{id}/engage'
+description: 'POST /resonators/{id}/engage - Engage a temporal resonator'
 ---
+
+## Endpoint
+
+```
+POST /v2/resonators/{id}/engage
+```
 
 Engage a temporal resonator with specified frequency and power parameters.
 
 <Warning>
   Requires `operator` role or higher. All safety checks must pass before engagement.
 </Warning>
+
+## Request Parameters
+
+### Path Parameters
+
+- `id` (string, required) - Resonator device ID (e.g., `tres_9000_01`)
+
+### Body Parameters
+
+```json
+{
+  "frequency": 2.847,
+  "power": 0.3,
+  "mode": "sympathetic",
+  "ramp_time": 30
+}
+```
+
+- `frequency` (number, required) - Target frequency in GHz
+- `power` (number, required) - Power level (0.0 - 1.0)
+- `mode` (string, optional) - Resonance mode: `sympathetic`, `destructive`, default: `sympathetic`
+- `ramp_time` (number, optional) - Gradual engagement time in seconds, default: 30
+
+## Response
+
+### Success Response (200 OK)
+
+```json
+{
+  "status": "engaged",
+  "resonator_id": "tres_9000_01",
+  "frequency": 2.847,
+  "power": 0.3,
+  "coherence": 0.94,
+  "timestamp": "2024-11-03T15:30:00Z"
+}
+```
+
+### Error Response (400 Bad Request)
+
+```json
+{
+  "error": {
+    "code": "insufficient_coherence",
+    "message": "Cannot engage resonator: field coherence below minimum threshold",
+    "details": {
+      "current_coherence": 0.72,
+      "minimum_required": 0.85
+    }
+  }
+}
+```

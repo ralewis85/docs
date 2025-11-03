@@ -72,12 +72,12 @@
       "anchors": [
         {
           "anchor": "Research Archive",
-          "href": "#",
+          "href": "https://tre-institute.research/archive",
           "icon": "flask"
         },
         {
           "anchor": "Safety Protocols",
-          "href": "#",
+          "href": "https://tre-institute.research/safety",
           "icon": "shield-halved"
         }
       ]
@@ -97,7 +97,7 @@
     "primary": {
       "type": "button",
       "label": "Certification Portal",
-      "href": "#"
+      "href": "https://portal.tre-institute.research"
     }
   },
   "contextual": {
@@ -114,9 +114,9 @@
   },
   "footer": {
     "socials": {
-      "x": "#",
-      "github": "#",
-      "linkedin": "#"
+      "x": "https://x.com/tre_council",
+      "github": "https://github.com/tre-institute",
+      "linkedin": "https://linkedin.com/company/tre-institute"
     }
   }
 }

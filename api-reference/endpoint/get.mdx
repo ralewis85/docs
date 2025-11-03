@@ -1,10 +1,52 @@
 ---
 title: 'Get Measurements'
-openapi: 'GET /detectors/{id}/measurements'
+description: 'GET /detectors/{id}/measurements - Retrieve detector measurements'
 ---
+
+## Endpoint
+
+```
+GET /v2/detectors/{id}/measurements
+```
 
 Retrieve temporal field measurements from a detector.
 
 <Info>
   Measurements are returned in chronological order. Use pagination for large datasets.
 </Info>
+
+## Request Parameters
+
+### Path Parameters
+
+- `id` (string, required) - Detector device ID (e.g., `tfd_500_01`)
+
+### Query Parameters
+
+- `start_time` (string, optional) - ISO 8601 timestamp for start of range
+- `end_time` (string, optional) - ISO 8601 timestamp for end of range
+- `limit` (integer, optional) - Maximum number of measurements to return (default: 100, max: 1000)
+- `cursor` (string, optional) - Pagination cursor from previous response
+
+## Response
+
+### Success Response (200 OK)
+
+```json
+{
+  "data": [
+    {
+      "timestamp": "2024-11-03T15:30:00.000Z",
+      "base_frequency": 2.847123,
+      "variance": 0.023,
+      "coherence": 0.94,
+      "field_strength": 0.15
+    }
+  ],
+  "pagination": {
+    "has_more": true,
+    "next_cursor": "eyJpZCI6MTIzNDU2fQ==",
+    "total_count": 15847
+  }
+}
+```
